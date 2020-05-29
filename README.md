@@ -5,7 +5,7 @@ Tranfer learning an object detection model to coral google (Mobilenet v2 ssd)
 
 wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz
 
-## . Giải nén vào thư mục learn_pet/ckpt
+## 2. Giải nén vào thư mục learn_pet/ckpt
 Thay đổi nội dung file pipeline.config như sau:
 - num_classes: 2: Số class train
 - type: "ssd_mobilenet_v2": Tên mạng
