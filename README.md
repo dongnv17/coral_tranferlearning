@@ -7,12 +7,14 @@ wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_qua
 
 ## 2. Giải nén vào thư mục learn_pet/ckpt
 Thay đổi nội dung file pipeline.config như sau:
+```
 - num_classes: 2: Số class train
 - type: "ssd_mobilenet_v2": Tên mạng
 - fine_tune_checkpoint: "/mnt/DATA/tensorflow/models/research/learn_pet/ckpt/model.ckpt": Đường dẫn đến checkpoint ssd_mobilenet_v2 ở trên
 - label_map_path: "/mnt/DATA/tensorflow/models/research/learn_pet/pet/hand_label_map.pbtxt": Đường dẫn đến label map
 - <train_input_reader> input_path: "/mnt/DATA/tensorflow/models/research/learn_pet/pet/hand_train.record": Đường dẫn output của TFRecord tập train data
 - <eval_input_reader>input_path: "/mnt/DATA/tensorflow/models/research/learn_pet/pet/hand_val.record": : Đường dẫn output của TFRecord tập validatation data
+```
 
 ## 3. Cài đặt các gói cho python (tensorflow, Pillow, lxml, protobuf, ...)
 
@@ -108,21 +110,28 @@ Thay đổi nội dung file pipeline.config như sau:
 	- Folder xmls: Chứa các annotations của các ảnh đã label
 ##5. Bắt đầu train (fine-turning model) và đợi
 Chạy lệnh: 
+```
 ./retrain_detection_model.sh --num_training_steps ${NUM_TRAINING_STEPS} --num_eval_steps ${NUM_EVAL_STEPS}
+```
 
 NUM_TRAINING_STEPS: Số step training (ví dụ 500)
 
 NUM_EVAL_STEPS: Số step validation (Ví dụ 100)
 ## 6. Convert checkpoint sau khi train sang TFLite và quantize 8bit cho edge Tpu
 Khi đang train sẽ bắt đầu sinh ra các checkpoint ở thư mục /mnt/DATA/tensorflow/models/research/learn_pet/train
-- Chạy lệnh: ./convert_checkpoint_to_edgetpu_tflite.sh --checkpoint_num 500 (Ví dụ với checkpoint 500)
+- Chạy lệnh: 
+```
+./convert_checkpoint_to_edgetpu_tflite.sh --checkpoint_num 500 (Ví dụ với checkpoint 500)
+```
 
 Sau khi chạy lệnh sẽ sinh ra model TFLite ở thư mục 
+```
 /mnt/DATA/tensorflow/models/research/learn_pet/models/output_tflite_graph_edgetpu.tflite
+```
 
 ## 7. Compile model ở trên để chạy được trên Edge Tpu
 - Cài Edge TPU compiler:
-
+```
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 
 echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
@@ -130,13 +139,13 @@ echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sud
 sudo apt update
 
 sudo apt-get install edgetpu-compiler
-
+```
 - Compile model:
-
+```
 cd /mnt/DATA/tensorflow/models/research/learn_pet/models/
 
 edgetpu_compiler output_tflite_graph.tflite
-
+```
 Sẽ sinh ra model: output_tflite_graph_edgetpu.tflite để chạy được trên Edge TPU
 
 ## Chú ý: Ở đây thư mục chưa project là: /mnt/DATA/tensorflow/models/research và các lệnh được chạy tại thư mục này
